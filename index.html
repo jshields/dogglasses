@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>
-            dogglasses.io
-        </title>
+        <title>dogglasses.io</title>
+        <script type="text/javascript" src="js/dogglasses.js"></script>
     </head>
     <body>
         <h1>dogglasses.io</h1>
+
+        <h2>Step 1: Pick Dog</h2>
+        <input id="dogFile" type="file" disabled="disabled" name="dogFile" value="Dog Image"> - OR -
+        <button id="defaultDogBtn" type="button">Use Default Dog</button>
+
+        <h2>Step 2: Pick Glasses</h2>
+        <input id="glassesFile" type="file" disabled="disabled" name="glassesFile" value="Glasses Image"> - OR -
+        <button id="defaultGlassesBtn" type="button" disabled="disabled">Use Default Glasses</button>
+
+
+        <button id="printBtn" type="button" disabled="disabled"><h2>Step 3: Print</h2></button>
+
+        <hr>
+        <div id="dogContainer"></div>
     </body>
 </html>
