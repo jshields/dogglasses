@@ -64,7 +64,7 @@ window.onload = function () {
     });
     document.getElementByID('defaultDogBtn').addEventListener('click', function (ev) {
         var dogImg = new Image();
-        dogImg.src = 'img/little_tootie.jpg';
+        dogImg.src = 'https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/little_tootie.jpg';
         setDog(dogImg);
     });
 
@@ -102,11 +102,11 @@ var setDog = function (dogImg) {
     canvas.width = dogImg.width;
     canvas.height = dogImg.height;
 
-    lastTime = Date.now();
     dogImg.onload = function() {
         main();
         // enable glasses picker
-
+        debugger;
+        document.getElementByID('defaultGlassesBtn');
     };
 
     dog = dogImg;
@@ -123,21 +123,10 @@ var setGlasses = function (glassesImg) {
 };
 
 var update = function () {
-    // Update game objects
-    /*
-    Calculate delta time, converting milliseconds to seconds.
-    Speed units are in pixels per second.
-    */
-    var currentTime = Date.now();
-    var deltaTime = (currentTime - lastTime) / 1000;
-
     if (clicked) {
         glasses.transform.coords.x = mouseX;
         glasses.transform.coords.y = mouseY;
     }
-
-    // Set `lastTime` for the next pass
-    lastTime = currentTime;
 };
 // Draw everything
 var render = function () {
@@ -145,7 +134,6 @@ var render = function () {
     ctx.drawImage(dog, 0, 0);
 
     // draw glasses
-
 
 };
 
@@ -157,5 +145,4 @@ var main = function () {
     requestAnimationFrame(main);
 };
 
-var lastTime;
 init();
