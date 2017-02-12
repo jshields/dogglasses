@@ -8,36 +8,41 @@
         <meta name="author" content="Joshua Shields">
         <title>dogglasses.io</title>
         <script type="text/javascript" src="js/dogglasses.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/dogglasses.css">
     </head>
     <body>
-        <header>
+        <header class="header">
             <h1>dogglasses.io</h1>
         </header>
 
-        <main>
-            <div>
-                <h2>Step 1: Pick Dog</h2>
-                <input id="dogFile" type="file" accept="image/*" disabled="disabled" name="dogFile" value="Dog Image"> - OR -
-                <button id="defaultDogBtn" type="button">Use Default Dog</button>
+        <main class="main">
+            <!-- TODO make the steps a train widget -->
+            <div class="step active">
+                <h3>Step 1: Pick Dog</h3>
+                <label>Dog Image (Coming Soon)
+                    <input id="dogFile" name="dogFile" type="file" accept="image/*" disabled="disabled">
+                </label>
+                - OR - <button id="defaultDogBtn" type="button">Use Default Dog</button>
             </div>
-            <hr>
 
-            <div>
-                <h2>Step 2: Pick Glasses</h2>
-                <input id="glassesFile" type="file" accept="image/*" disabled="disabled" name="glassesFile" value="Glasses Image"> - OR -
-                <button id="defaultGlassesBtn" type="button" disabled="disabled">Use Default Glasses</button>
+            <div class="step">
+                <h3>Step 2: Pick Glasses</h3>
+                <label>Glasses Image (Coming Soon)
+                    <input id="glassesFile" name="glassesFile" type="file" accept="image/*" disabled="disabled">
+                </label>
+                - OR - <button id="defaultGlassesBtn" type="button" disabled="disabled">Use Default Glasses</button>
             </div>
-            <hr>
 
-            <div>
-                <button id="printBtn" type="button" disabled="disabled"><h2>Step 3: Print</h2></button>
+            <div class="step">
+                <button id="printBtn" type="button" disabled="disabled"><h3>Step 3: Print (Coming Soon)</h3></button>
             </div>
-            <hr>
 
             <div id="dogContainer"></div>
+
+
+            <input id="glassesScale" type="range" min="0.1" max="10" step="0.1">
         </main>
 
-        <footer>
-        </footer>
+        <footer></footer>
     </body>
 </html>

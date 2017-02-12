@@ -1,0 +1,12 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+.header {
+    padding: 0.5em;
+}
+.step {
+    margin-top: 2em;
+    padding: 1em;
+    border-bottom: 1px solid #000;
+}
