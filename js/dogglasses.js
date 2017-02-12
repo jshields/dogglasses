@@ -58,16 +58,12 @@ window.onload = function () {
     document.getElementById('dogFile').addEventListener('change', function (ev) {
         debugger;
         var files = this.files;
-        var src = files[0].name;
+        var dogImgPath = files[0].name;
 
-        var dogImg = new Image();
-        dogImg.src = src;
-        setDog(dogImg);
+        setDog(dogImgPath);
     });
     document.getElementById('defaultDogBtn').addEventListener('click', function (ev) {
-        var dogImg = new Image();
-        dogImg.src = 'https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/little_tootie.jpg';
-        setDog(dogImg);
+        setDog('https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/little_tootie.jpg');
     });
 
     // glasses buttons
@@ -95,38 +91,40 @@ var init = function () {
     ctx.font = '18px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText('Pick a dog to get started' + score, 16, 16);
+    ctx.fillText('Pick a dog to get started', 16, 16);
+
+
+    //
+    //ctx.drawImage(test, 0, 0);
 };
 
 var dog;
 var glasses;
 
-var setDog = function (dogImg) {
-    canvas.width = dogImg.width;
-    canvas.height = dogImg.height;
+var setDog = function (dogImgPath) {
+    var dogImg = new Image();
+    dogImg.src = dogImgPath;
 
-    dogImg.onload = function (ev) {
-        main();
+    dogImg.addEventListener('load', function (ev) {
+        dog = dogImg;
+        canvas.width = dogImg.width;
+        canvas.height = dogImg.height;
         // enable glasses picker
-        debugger;
         document.getElementById('defaultGlassesBtn').removeAttribute('disabled');
-    };
-
-    dog = dogImg;
+        // start render loop
+        main();
+    });
 };
 var setGlasses = function (glassesImg) {
-
     glassesImg.onload = function() {
         var transform = new Transform(new Coords());
-
         var glassesObj = new ImageObject(glassesImg, transform);
+        glasses = glassesObj;
     };
-
-    glasses = glassesObj;
 };
 
 var update = function () {
-    if (clicked) {
+    if (clicked && glasses) {
         glasses.transform.coords.x = mouseX;
         glasses.transform.coords.y = mouseY;
     }
@@ -135,8 +133,9 @@ var update = function () {
 // Draw everything
 var render = function () {
     // draw dog as a background
-    ctx.drawImage(dog, 0, 0);
-
+    if (dog) {
+        ctx.drawImage(dog, 0, 0);
+    }
     // draw glasses
     if (glasses) {
         glasses.draw(ctx);
