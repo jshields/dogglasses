@@ -12,8 +12,8 @@ var Coords = function (x, y) {
 var Transform = function (translationCoords, rotationRadians, scale, directionVector) {
     this.coords = translationCoords;
     //this.rotation = rotationRadians;
-    this.scale = scale;
-    this.direction = directionVector;
+    //this.scale = scale;
+    //this.direction = directionVector;
 };
 var ImageObject = function (image, transform) {
     this.image = image;
@@ -54,9 +54,11 @@ var ctx = canvas.getContext('2d', {'alpha': false});
 window.onload = function () {
     document.body.appendChild(canvas);
 
-    document.getElementByID('dogFile').addEventListener('click', function (ev) {
-        var dogElement = document.getElementByID();
-        var src = '';
+    // dog buttons
+    document.getElementByID('dogFile').addEventListener('change', function (ev) {
+        debugger;
+        var files = this.files;
+        var src = files[0].name;
 
         var dogImg = new Image();
         dogImg.src = src;
@@ -69,9 +71,10 @@ window.onload = function () {
     });
 
     // glasses buttons
-    document.getElementByID('glassesFile').addEventListener('click', function (ev) {
-        var glassesElement = document.getElementByID();
-        var src = '';
+    document.getElementByID('glassesFile').addEventListener('change', function (ev) {
+        debugger;
+        var files = this.files;
+        var src = files[0].name;
 
         var glassesImg = new Image();
         glassesImg.src = src;
@@ -79,7 +82,7 @@ window.onload = function () {
     });
     document.getElementByID('defaultGlassesBtn').addEventListener('click', function (ev) {
         var glassesImg = new Image();
-        glassesImg.src = 'img/sunglasses.jpg';
+        glassesImg.src = 'https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/dealwithit_glasses_front.png';
         setGlasses(glassesImg);
     });
 };
@@ -87,7 +90,7 @@ window.onload = function () {
 var init = function () {
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     ctx.fillStyle = '#000';
     ctx.font = '18px sans-serif';
     ctx.textAlign = 'left';
@@ -114,7 +117,7 @@ var setDog = function (dogImg) {
 var setGlasses = function (glassesImg) {
 
     glassesImg.onload = function() {
-        var transform = new Transform();
+        var transform = new Transform(new Coords());
 
         var glassesObj = new ImageObject(glassesImg, transform);
     };
@@ -130,11 +133,13 @@ var update = function () {
 };
 // Draw everything
 var render = function () {
-    // draw dog
+    // draw dog as a background
     ctx.drawImage(dog, 0, 0);
 
     // draw glasses
-
+    if (glasses) {
+        glasses.draw();
+    }
 };
 
 var main = function () {
