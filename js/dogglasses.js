@@ -22,7 +22,7 @@ var ImageObject = function (image, transform) {
         canvasCtx.drawImage(
             this.image,
             this.transform.coords.x,
-            this.transform.coords.y,
+            this.transform.coords.y
             //this.transform.scale * this.image.width,
             //this.transform.scale * this.image.height,
         );
@@ -36,12 +36,12 @@ addEventListener('mousedown', function (ev) {
     mouseX = ev.pageX;
     mouseY = ev.pageY;
     clicked = true;
-}, false);
+});
 addEventListener('mouseup', function (ev) {
     mouseX = ev.pageX;
     mouseY = ev.pageY;
     clicked = false;
-}, false);
+});
 
 
 var resolution = new Coords(640, 640);
@@ -55,7 +55,7 @@ window.onload = function () {
     document.body.appendChild(canvas);
 
     // dog buttons
-    document.getElementByID('dogFile').addEventListener('change', function (ev) {
+    document.getElementById('dogFile').addEventListener('change', function (ev) {
         debugger;
         var files = this.files;
         var src = files[0].name;
@@ -64,14 +64,14 @@ window.onload = function () {
         dogImg.src = src;
         setDog(dogImg);
     });
-    document.getElementByID('defaultDogBtn').addEventListener('click', function (ev) {
+    document.getElementById('defaultDogBtn').addEventListener('click', function (ev) {
         var dogImg = new Image();
         dogImg.src = 'https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/little_tootie.jpg';
         setDog(dogImg);
     });
 
     // glasses buttons
-    document.getElementByID('glassesFile').addEventListener('change', function (ev) {
+    document.getElementById('glassesFile').addEventListener('change', function (ev) {
         debugger;
         var files = this.files;
         var src = files[0].name;
@@ -80,7 +80,7 @@ window.onload = function () {
         glassesImg.src = src;
         setGlasses(glassesImg);
     });
-    document.getElementByID('defaultGlassesBtn').addEventListener('click', function (ev) {
+    document.getElementById('defaultGlassesBtn').addEventListener('click', function (ev) {
         var glassesImg = new Image();
         glassesImg.src = 'https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/dealwithit_glasses_front.png';
         setGlasses(glassesImg);
@@ -105,11 +105,11 @@ var setDog = function (dogImg) {
     canvas.width = dogImg.width;
     canvas.height = dogImg.height;
 
-    dogImg.onload = function() {
+    dogImg.onload = function (ev) {
         main();
         // enable glasses picker
         debugger;
-        document.getElementByID('defaultGlassesBtn');
+        document.getElementById('defaultGlassesBtn').removeAttribute('disabled');
     };
 
     dog = dogImg;
@@ -131,6 +131,7 @@ var update = function () {
         glasses.transform.coords.y = mouseY;
     }
 };
+
 // Draw everything
 var render = function () {
     // draw dog as a background
@@ -138,7 +139,7 @@ var render = function () {
 
     // draw glasses
     if (glasses) {
-        glasses.draw();
+        glasses.draw(ctx);
     }
 };
 
