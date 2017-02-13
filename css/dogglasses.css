@@ -6,7 +6,5 @@ html, body {
     padding: 0.5em;
 }
 .step {
-    margin-top: 2em;
-    padding: 1em;
     border-bottom: 1px solid #000;
 }

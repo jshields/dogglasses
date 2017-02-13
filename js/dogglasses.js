@@ -1,18 +1,20 @@
 'use strict';
 
+/*
 var Vector2D = function (coords, scale) {
     this.coords = coords;
     this.scale = scale;
 };
+*/
 var Coords = function (x, y) {
     this.x = x;
     this.y = y;
     return this;
 };
-var Transform = function (translationCoords, rotationRadians, scale, directionVector) {
+var Transform = function (translationCoords, scale) {
     this.coords = translationCoords;
     //this.rotation = rotationRadians;
-    //this.scale = scale;
+    this.scale = scale;
     //this.direction = directionVector;
 };
 var ImageObject = function (image, transform) {
@@ -22,28 +24,12 @@ var ImageObject = function (image, transform) {
         canvasCtx.drawImage(
             this.image,
             this.transform.coords.x,
-            this.transform.coords.y
-            // TODO
-            //this.transform.scale * this.image.width,
-            //this.transform.scale * this.image.height,
+            this.transform.coords.y,
+            this.transform.scale * this.image.width,
+            this.transform.scale * this.image.height
         );
     };
 };
-
-// Handle click state tracking
-var clicked = false;
-var mouseX, mouseY;
-addEventListener('mousedown', function (ev) {
-    // TODO update mouseX in real time
-    mouseX = ev.pageX;
-    mouseY = ev.pageY;
-    clicked = true;
-});
-addEventListener('mouseup', function (ev) {
-    mouseX = ev.pageX;
-    mouseY = ev.pageY;
-    clicked = false;
-});
 
 // FIXME: window.innerWidth includes width of vertical scrollbar (15 in Chrome), we don't want that
 var resolution = new Coords(window.innerWidth - 15, window.innerHeight);
@@ -54,7 +40,24 @@ canvas.width = resolution.x;
 canvas.height = resolution.y;
 var ctx = canvas.getContext('2d', {'alpha': false});
 
+var clicked = false;
+var mouseX, mouseY;
+
 window.onload = function (ev) {
+
+    canvas.addEventListener('mousedown', function (ev) {
+        // TODO update mouse position in real time / support dragging the image
+        // FIXME glasses Y are drawn in wrong place relative to canvas
+        mouseX = ev.pageX;
+        mouseY = ev.pageY;
+        console.log('Mouse: ' + mouseX + ', ' + mouseY);
+
+        clicked = true;
+    });
+    canvas.addEventListener('mouseup', function (ev) {
+        clicked = false;
+    });
+
     document.getElementById('dogContainer').appendChild(canvas);
 
     // dog buttons
@@ -81,6 +84,11 @@ window.onload = function (ev) {
     });
     document.getElementById('defaultGlassesBtn').addEventListener('click', function (ev) {
         setGlasses('https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/dealwithit_glasses_front.png');
+    });
+
+    document.getElementById('glassesScale').addEventListener('change', function (ev) {
+        debugger;
+        glasses.transform.scale = this.value;
     });
 };
 
@@ -119,8 +127,9 @@ var setGlasses = function (glassesImgPath) {
     glassesImg.src = glassesImgPath;
 
     glassesImg.addEventListener('load', function (ev) {
-        var transform = new Transform(new Coords(0, 0));
+        var transform = new Transform(new Coords(0, 0), 1);
         var glassesObj = new ImageObject(glassesImg, transform);
+        document.getElementById('glassesScale').removeAttribute('disabled');
         glasses = glassesObj;
     });
 };
