@@ -34,6 +34,7 @@ var ImageObject = function (image, transform) {
 var clicked = false;
 var mouseX, mouseY;
 addEventListener('mousedown', function (ev) {
+    // TODO update mouseX in real time
     mouseX = ev.pageX;
     mouseY = ev.pageY;
     clicked = true;
