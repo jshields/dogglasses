@@ -11,37 +11,40 @@
         <link rel="stylesheet" type="text/css" href="css/dogglasses.css">
     </head>
     <body>
+
         <header class="header">
             <h1>dogglasses.io</h1>
         </header>
 
         <main class="main">
-            <!-- TODO make the steps a train widget -->
-            <div class="step active">
-                <h3>Step 1: Pick Dog</h3>
-                <label>Dog Image (Coming Soon)
-                    <input id="dogFile" name="dogFile" type="file" accept="image/*" disabled="disabled">
-                </label>
-                - OR - <button id="defaultDogBtn" type="button">Use Default Dog</button>
-            </div>
-
-            <div class="step">
-                <h3>Step 2: Pick Glasses</h3>
-                <label>Glasses Image (Coming Soon)
-                    <input id="glassesFile" name="glassesFile" type="file" accept="image/*" disabled="disabled">
-                </label>
-                - OR - <button id="defaultGlassesBtn" type="button" disabled="disabled">Use Default Glasses</button>
-            </div>
-
-            <div class="step">
-                <button id="printBtn" type="button" disabled="disabled"><h3>Step 3: Print (Coming Soon)</h3></button>
-            </div>
-
             <div id="dogContainer"></div>
 
-            <label>Scale Glasses
-                <input id="glassesScale" name="glassesScale" disabled="disabled" type="range" min="0.1" max="10" step="0.1" value="1">
-            </label>
+            <!-- TODO make the steps a train widget -->
+            <div class="instructions">
+                <div class="step active">
+                    <h3>Step 1: Pick Dog</h3>
+                    <label>Dog Image (Coming Soon)
+                        <input id="dogFile" name="dogFile" type="file" accept="image/*" disabled="disabled">
+                    </label>
+                    - OR - <button id="defaultDogBtn" type="button">Use Default Dog</button>
+                </div>
+
+                <div class="step">
+                    <h3>Step 2: Pick Glasses</h3>
+                    <label>Glasses Image (Coming Soon)
+                        <input id="glassesFile" name="glassesFile" type="file" accept="image/*" disabled="disabled">
+                    </label>
+                    - OR - <button id="defaultGlassesBtn" type="button" disabled="disabled">Use Default Glasses</button>
+
+                    <label>Scale Glasses
+                        <input id="glassesScale" name="glassesScale" disabled="disabled" type="range" min="0.1" max="3" step="0.1" value="1">
+                    </label>
+                </div>
+
+                <div class="step">
+                    <button id="printBtn" type="button" disabled="disabled"><h3>Step 3: Print (Coming Soon)</h3></button>
+                </div>
+            </div>
         </main>
 
         <footer></footer>

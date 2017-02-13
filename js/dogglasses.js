@@ -47,7 +47,11 @@ window.onload = function (ev) {
 
     canvas.addEventListener('mousedown', function (ev) {
         // TODO update mouse position in real time / support dragging the image
-        // FIXME glasses Y are drawn in wrong place relative to canvas
+        /*
+        FIXME
+        mouse coords will be incorrect relative to canvas
+        unless we draw canvas from top left corner of viewport
+        */
         mouseX = ev.pageX;
         mouseY = ev.pageY;
         console.log('Mouse: ' + mouseX + ', ' + mouseY);
@@ -76,10 +80,8 @@ window.onload = function (ev) {
     document.getElementById('glassesFile').addEventListener('change', function (ev) {
         debugger;
         var files = this.files;
-        var src = files[0].name;
+        var glassesImgPath = files[0].name;
 
-        var glassesImg = new Image();
-        glassesImg.src = src;
         setGlasses(glassesImgPath);
     });
     document.getElementById('defaultGlassesBtn').addEventListener('click', function (ev) {
@@ -97,10 +99,10 @@ var init = function () {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = '#000';
-    ctx.font = '18px sans-serif';
+    ctx.font = '22px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText('Pick a dog to get started', 16, 16);
+    ctx.fillText('Pick a dog to get started', 64, 64);
 };
 
 var dog;
@@ -113,9 +115,7 @@ var setDog = function (dogImgPath) {
 
     dogImg.addEventListener('load', function (ev) {
         dog = dogImg;
-
-        //canvas.width = dogImg.width;
-        //canvas.height = dogImg.height;
+        canvas.height = dogImg.height;
         // enable glasses picker
         document.getElementById('defaultGlassesBtn').removeAttribute('disabled');
         // start render loop
@@ -150,8 +150,10 @@ var render = function () {
     // draw glasses
     if (glasses) {
         glasses.draw(ctx);
+        ctx.fillText('Click to place, use slider to scale', 128, 128);
     } else {
-        ctx.fillText('Now pick the glasses', 16, 16);
+        // FIXME scale text relative to dog image resolution
+        ctx.fillText('Now pick the glasses', 128, 128);
     }
 };
 
