@@ -20,11 +20,11 @@
             <div id="dogContainer"></div>
 
             <!-- TODO make the steps a train widget -->
-            <div class="instructions">
+            <div id="instructions">
                 <div class="step active">
                     <h3>Step 1: Pick Dog</h3>
                     <label>Dog Image (Coming Soon)
-                        <input id="dogFile" name="dogFile" type="file" accept="image/*" disabled="disabled">
+                        <input id="dogFile" name="dogFile" type="file" accept="image/*">
                     </label>
                     - OR - <button id="defaultDogBtn" type="button">Use Default Dog</button>
                 </div>
@@ -42,11 +42,13 @@
                 </div>
 
                 <div class="step">
-                    <button id="printBtn" type="button" disabled="disabled"><h3>Step 3: Print (Coming Soon)</h3></button>
+                    <button id="printBtn" type="button" disabled="disabled"><h3>Step 3: Save</h3></button>
                 </div>
             </div>
         </main>
 
-        <footer></footer>
+        <footer class="footer">
+            Source: <a href="https://github.com/jshields/dogglasses.io" target="_blank" rel="noopener noreferrer">jshields/dogglasses.io</a>
+        </footer>
     </body>
 </html>

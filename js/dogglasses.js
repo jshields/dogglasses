@@ -32,7 +32,7 @@ var ImageObject = function (image, transform) {
 };
 
 // FIXME: window.innerWidth includes width of vertical scrollbar (15 in Chrome), we don't want that
-var resolution = new Coords(window.innerWidth - 15, window.innerHeight);
+var resolution = new Coords(window.innerWidth - 15, 640);
 
 var canvas = document.createElement('canvas');
 canvas.innerText = 'Your browser does not support the canvas element.';
@@ -45,8 +45,14 @@ var mouseX, mouseY;
 
 window.onload = function (ev) {
 
+    // mouse state variables for canvas... Is there a better way?
     canvas.addEventListener('mousedown', function (ev) {
-        // TODO update mouse position in real time / support dragging the image
+        clicked = true;
+    });
+    canvas.addEventListener('mouseup', function (ev) {
+        clicked = false;
+    });
+    canvas.addEventListener('mousemove', function (ev) {
         /*
         FIXME
         mouse coords will be incorrect relative to canvas
@@ -54,43 +60,63 @@ window.onload = function (ev) {
         */
         mouseX = ev.pageX;
         mouseY = ev.pageY;
-        console.log('Mouse: ' + mouseX + ', ' + mouseY);
-
-        clicked = true;
-    });
-    canvas.addEventListener('mouseup', function (ev) {
-        clicked = false;
     });
 
     document.getElementById('dogContainer').appendChild(canvas);
 
     // dog buttons
     document.getElementById('dogFile').addEventListener('change', function (ev) {
-        debugger;
+        // TODO support image URI input
         var files = this.files;
         var dogImgPath = files[0].name;
 
         setDog(dogImgPath);
     });
     document.getElementById('defaultDogBtn').addEventListener('click', function (ev) {
-        setDog('https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/little_tootie.jpg');
+        setDog('img/little_tootie.jpg');
     });
 
     // glasses buttons
     document.getElementById('glassesFile').addEventListener('change', function (ev) {
-        debugger;
         var files = this.files;
         var glassesImgPath = files[0].name;
 
         setGlasses(glassesImgPath);
     });
     document.getElementById('defaultGlassesBtn').addEventListener('click', function (ev) {
-        setGlasses('https://raw.githubusercontent.com/jshields/dogglasses.io/master/img/dealwithit_glasses_front.png');
+        setGlasses('img/dealwithit_glasses_front.png');
     });
 
     document.getElementById('glassesScale').addEventListener('change', function (ev) {
-        debugger;
         glasses.transform.scale = this.value;
+    });
+
+    // save image
+    document.getElementById('printBtn').addEventListener('click', function (ev) {
+        ctx.fillText('Made using dogglasses.io', 64, 64);
+
+        // Attribute length too long for browser to handle with large dogs,
+        // use blob instead.
+        //var imgUrl = canvas.toDataURL('image/png');
+
+        canvas.toBlob(function (blob) {
+            var imgUrl = URL.createObjectURL(blob);
+
+            var link = document.createElement('a');
+            link.innerText = 'Download';
+            link.setAttribute('href', imgUrl);
+            link.setAttribute('download', 'dogglasses.png');
+
+            //link.addEventListener('click', function () {
+                // no longer need to read the blob so it's revoked
+            //    URL.revokeObjectURL(url);
+            //});
+            document.getElementById('instructions').appendChild(link);
+        });
+
+        // TODO Chrome blocks un-trusted events, is there a work around?
+        //var clickEvent = new Event('click');
+        //link.dispatchEvent(clickEvent);
     });
 };
 
@@ -109,14 +135,21 @@ var dog;
 var glasses;
 
 var setDog = function (dogImgPath) {
+
+    var _resizeCanvasForDog = function (canvas, dog) {
+
+        dogImg.width = canvas.width;
+        canvas.height = dog.height;
+    };
+
     var dogImg = new Image();
     dogImg.src = dogImgPath;
-    dogImg.width = canvas.width;
 
     dogImg.addEventListener('load', function (ev) {
         dog = dogImg;
-        canvas.height = dogImg.height;
+        _resizeCanvasForDog(canvas, dog);
         // enable glasses picker
+        document.getElementById('glassesFile').removeAttribute('disabled');
         document.getElementById('defaultGlassesBtn').removeAttribute('disabled');
         // start render loop
         main();
@@ -130,6 +163,7 @@ var setGlasses = function (glassesImgPath) {
         var transform = new Transform(new Coords(0, 0), 1);
         var glassesObj = new ImageObject(glassesImg, transform);
         document.getElementById('glassesScale').removeAttribute('disabled');
+        document.getElementById('printBtn').removeAttribute('disabled');
         glasses = glassesObj;
     });
 };
@@ -150,7 +184,9 @@ var render = function () {
     // draw glasses
     if (glasses) {
         glasses.draw(ctx);
-        ctx.fillText('Click to place, use slider to scale', 128, 128);
+        //document.getElementById('helpText').innerText = '';
+        // FIXME don't show this text on downloads
+        ctx.fillText('Click & drag glasses into place, use slider to scale', 128, 128);
     } else {
         // FIXME scale text relative to dog image resolution
         ctx.fillText('Now pick the glasses', 128, 128);

@@ -2,12 +2,18 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
+
 .header {
     position: absolute;
     top: 6;
     left: 6;
 }
-.instructions {
+.footer {
+    position: fixed;
+    bottom: 0;
+}
+#instructions {
     border: 1px solid #000;
     position: absolute;
     right: 0;
