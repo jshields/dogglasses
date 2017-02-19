@@ -68,26 +68,39 @@ window.onload = function (ev) {
     document.getElementById('dogContainer').appendChild(canvas);
 
     // dog buttons
-    document.getElementById('dogFile').addEventListener('input', function (ev) {
-        // TODO support image URI input
-        var files = this.files;
-        var dogImgPath = files[0].name;
+    document.getElementById('dogFile').addEventListener('change', function (ev) {
+        // TODO support image URI input?
 
-        setDog(dogImgPath);
+        var file = this.files[0];
+
+        var reader = new FileReader();
+        // set callback for when file is read
+        reader.addEventListener('loadend', function (ev) {
+            setDog(ev.target.result);
+        });
+        /*
+        FIXME img src attr may be too long for large files when using data URL?
+        Use object URL?
+        img.src = URL.createObjectURL(file);
+        img.onload = function (ev) {
+            URL.revokeObjectURL(this.src);
+        };
+        */
+        // start reading file
+        if (file) {
+            reader.readAsDataURL(file);    
+        }
     });
     document.getElementById('defaultDogBtn').addEventListener('click', function (ev) {
         setDog('img/little_tootie.jpg');
     });
 
     // glasses buttons
-    document.getElementById('glassesFile').addEventListener('input', function (ev) {
-        var files = this.files;
-        var glassesImgPath = files[0].name;
-
-        setGlasses(glassesImgPath);
+    document.getElementById('glassesFile').addEventListener('change', function (ev) {
+        console.error('not implemented');
     });
     document.getElementById('defaultGlassesBtn').addEventListener('click', function (ev) {
-        setGlasses('img/dealwithit_glasses_front.png');
+        setGlasses('img/dealwithit_glasses.png');
     });
 
     document.getElementById('glassesScale').addEventListener('input', function (ev) {
@@ -103,6 +116,7 @@ window.onload = function (ev) {
         //var imgUrl = canvas.toDataURL('image/png');
 
         canvas.toBlob(function (blob) {
+            // Will user images cause Tainted Canvas error?
             var imgUrl = URL.createObjectURL(blob);
 
             var link = document.createElement('a');
@@ -110,10 +124,9 @@ window.onload = function (ev) {
             link.setAttribute('href', imgUrl);
             link.setAttribute('download', 'dogglasses.png');
 
-            //link.addEventListener('click', function () {
-                // no longer need to read the blob so it's revoked
-            //    URL.revokeObjectURL(url);
-            //});
+            // TODO after download is finished
+            //URL.revokeObjectURL(imgUrl);
+
             document.getElementById('instructions').appendChild(link);
         });
 
@@ -129,9 +142,7 @@ var init = function () {
 
     ctx.fillStyle = '#000';
     ctx.font = '22px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Pick a dog to get started', 64, 64);
+    ctx.fillText('Pick a dog to get started', 96, 96);
 };
 
 var dog;
@@ -139,9 +150,18 @@ var glasses;
 
 var setDog = function (dogImgPath) {
 
-    var _resizeCanvasForDog = function (canvas, dog) {
+    var _resizeCanvas = function (canvas, dog) {
+        // TODO resize dog+canvas to fit viewport better
+        //dog.width = canvas.width;
+        //
 
-        dogImg.width = canvas.width;
+        // clamp canvas/dog size
+        if (dog.width < canvas.width) {
+            canvas.width = dog.width;
+        } else {
+            // dog larger than canvas
+            dog.width = canvas.width;
+        }
         canvas.height = dog.height;
     };
 
@@ -150,7 +170,7 @@ var setDog = function (dogImgPath) {
 
     dogImg.addEventListener('load', function (ev) {
         dog = dogImg;
-        _resizeCanvasForDog(canvas, dog);
+        _resizeCanvas(canvas, dog);
         // enable glasses picker
         document.getElementById('glassesFile').removeAttribute('disabled');
         document.getElementById('defaultGlassesBtn').removeAttribute('disabled');
@@ -158,6 +178,7 @@ var setDog = function (dogImgPath) {
         main();
     });
 };
+
 var setGlasses = function (glassesImgPath) {
     var glassesImg = new Image();
     glassesImg.src = glassesImgPath;
@@ -189,10 +210,12 @@ var render = function () {
         glasses.draw(ctx);
         //document.getElementById('helpText').innerText = '';
         // FIXME don't show this text on downloads
-        ctx.fillText('Click & drag glasses into place, use slider to scale', 128, 128);
+        ctx.font = '22px sans-serif';
+        ctx.fillText('Click & drag glasses into place, use slider to scale', 96, 96);
     } else {
         // FIXME scale text relative to dog image resolution
-        ctx.fillText('Now pick the glasses', 128, 128);
+        ctx.font = '22px sans-serif';
+        ctx.fillText('Now pick the glasses', 96, 96);
     }
 };
 
