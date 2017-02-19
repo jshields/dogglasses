@@ -1,0 +1,26 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+
+.header {
+    position: absolute;
+    top: 6;
+    left: 6;
+}
+.footer {
+    position: fixed;
+    bottom: 0;
+}
+#instructions {
+    border: 1px solid #000;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: rgba(100, 100, 100, 0.5);
+    width: 271px;
+}
+.step {
+    border-bottom: 1px solid #000;
+}
