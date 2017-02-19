@@ -57,6 +57,9 @@ window.onload = function (ev) {
         FIXME
         mouse coords will be incorrect relative to canvas
         unless we draw canvas from top left corner of viewport
+
+        FIXME dragging works in Chrome but not FF
+        use drag event instead?
         */
         mouseX = ev.pageX;
         mouseY = ev.pageY;
@@ -65,7 +68,7 @@ window.onload = function (ev) {
     document.getElementById('dogContainer').appendChild(canvas);
 
     // dog buttons
-    document.getElementById('dogFile').addEventListener('change', function (ev) {
+    document.getElementById('dogFile').addEventListener('input', function (ev) {
         // TODO support image URI input
         var files = this.files;
         var dogImgPath = files[0].name;
@@ -77,7 +80,7 @@ window.onload = function (ev) {
     });
 
     // glasses buttons
-    document.getElementById('glassesFile').addEventListener('change', function (ev) {
+    document.getElementById('glassesFile').addEventListener('input', function (ev) {
         var files = this.files;
         var glassesImgPath = files[0].name;
 
@@ -87,7 +90,7 @@ window.onload = function (ev) {
         setGlasses('img/dealwithit_glasses_front.png');
     });
 
-    document.getElementById('glassesScale').addEventListener('change', function (ev) {
+    document.getElementById('glassesScale').addEventListener('input', function (ev) {
         glasses.transform.scale = this.value;
     });
 
