@@ -4,6 +4,7 @@
 var Vector2D = function (coords, scale) {
     this.coords = coords;
     this.scale = scale;
+    this.normalize = function () {};
 };
 */
 var Coords = function (x, y) {
@@ -43,7 +44,7 @@ var ctx = canvas.getContext('2d', {'alpha': false});
 var clicked = false;
 var mouseX, mouseY;
 
-window.onload = function (ev) {
+window.addEventListener('load', function (ev) {
 
     // mouse state variables for canvas... Is there a better way?
     canvas.addEventListener('mousedown', function (ev) {
@@ -64,20 +65,11 @@ window.onload = function (ev) {
         mouseX = ev.pageX;
         mouseY = ev.pageY;
     });
-
     document.getElementById('dogContainer').appendChild(canvas);
 
     // dog buttons
     document.getElementById('dogFile').addEventListener('change', function (ev) {
         // TODO support image URI input?
-
-        var file = this.files[0];
-
-        var reader = new FileReader();
-        // set callback for when file is read
-        reader.addEventListener('loadend', function (ev) {
-            setDog(ev.target.result);
-        });
         /*
         FIXME img src attr may be too long for large files when using data URL?
         Use object URL?
@@ -86,9 +78,16 @@ window.onload = function (ev) {
             URL.revokeObjectURL(this.src);
         };
         */
-        // start reading file
+        // TODO Test this with very large image
+        var file = this.files[0];
         if (file) {
-            reader.readAsDataURL(file);    
+            var reader = new FileReader();
+            // set callback for when file is read
+            reader.addEventListener('loadend', function (ev) {
+                setDog(ev.target.result);
+            });
+            // start reading file
+            reader.readAsDataURL(file);
         }
     });
     document.getElementById('defaultDogBtn').addEventListener('click', function (ev) {
@@ -97,7 +96,14 @@ window.onload = function (ev) {
 
     // glasses buttons
     document.getElementById('glassesFile').addEventListener('change', function (ev) {
-        console.error('not implemented');
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.addEventListener('loadend', function (ev) {
+                setGlasses(ev.target.result);
+            });
+            reader.readAsDataURL(file);
+        }
     });
     document.getElementById('defaultGlassesBtn').addEventListener('click', function (ev) {
         setGlasses('img/dealwithit_glasses.png');
@@ -109,7 +115,7 @@ window.onload = function (ev) {
 
     // save image
     document.getElementById('printBtn').addEventListener('click', function (ev) {
-        ctx.fillText('Made using dogglasses.io', 64, 64);
+        ctx.fillText('Made using dogglasses.io', 16, 16);
 
         // Attribute length too long for browser to handle with large dogs,
         // use blob instead.
@@ -134,16 +140,7 @@ window.onload = function (ev) {
         //var clickEvent = new Event('click');
         //link.dispatchEvent(clickEvent);
     });
-};
-
-var init = function () {
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#000';
-    ctx.font = '22px sans-serif';
-    ctx.fillText('Pick a dog to get started', 96, 96);
-};
+});
 
 var dog;
 var glasses;
@@ -151,15 +148,11 @@ var glasses;
 var setDog = function (dogImgPath) {
 
     var _resizeCanvas = function (canvas, dog) {
-        // TODO resize dog+canvas to fit viewport better
-        //dog.width = canvas.width;
-        //
-
-        // clamp canvas/dog size
         if (dog.width < canvas.width) {
             canvas.width = dog.width;
         } else {
             // dog larger than canvas
+            // TODO smaller max size?
             dog.width = canvas.width;
         }
         canvas.height = dog.height;
@@ -192,39 +185,42 @@ var setGlasses = function (glassesImgPath) {
     });
 };
 
+
+// canvas update / draw cycle
+var init = function () {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#000';
+    ctx.font = '22px sans-serif';
+    ctx.fillText('Pick a dog to get started', 96, 96);
+};
 var update = function () {
     if (clicked && glasses) {
         glasses.transform.coords.x = mouseX;
         glasses.transform.coords.y = mouseY;
     }
 };
-
-// Draw everything
 var render = function () {
-    // draw dog as a background
+    ctx.fillStyle = '#000';
+    ctx.font = '22px sans-serif';
+
     if (dog) {
+        // draw dog as a background
         ctx.drawImage(dog, 0, 0, dog.width, dog.height);
     }
-    // draw glasses
     if (glasses) {
         glasses.draw(ctx);
         //document.getElementById('helpText').innerText = '';
         // FIXME don't show this text on downloads
-        ctx.font = '22px sans-serif';
         ctx.fillText('Click & drag glasses into place, use slider to scale', 96, 96);
     } else {
-        // FIXME scale text relative to dog image resolution
-        ctx.font = '22px sans-serif';
         ctx.fillText('Now pick the glasses', 96, 96);
     }
 };
-
 var main = function () {
     update();
     render();
-
     // Call `main` again when the next frame is ready.
     requestAnimationFrame(main);
 };
-
 init();
