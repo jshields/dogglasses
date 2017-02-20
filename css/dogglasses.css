@@ -24,3 +24,10 @@ html, body {
 .step {
     border-bottom: 1px solid #000;
 }
+.label {
+    font-weight: bold;
+    display: block;
+}
+.control {
+    display: block;
+}

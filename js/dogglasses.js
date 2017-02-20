@@ -126,7 +126,7 @@ window.addEventListener('load', function (ev) {
             var imgUrl = URL.createObjectURL(blob);
 
             var link = document.createElement('a');
-            link.innerText = 'Download';
+            link.innerText = 'Click here if download does not begin automatically';
             link.setAttribute('href', imgUrl);
             link.setAttribute('download', 'dogglasses.png');
 
@@ -134,11 +134,11 @@ window.addEventListener('load', function (ev) {
             //URL.revokeObjectURL(imgUrl);
 
             document.getElementById('instructions').appendChild(link);
-        });
 
-        // TODO Chrome blocks un-trusted events, is there a work around?
-        //var clickEvent = new Event('click');
-        //link.dispatchEvent(clickEvent);
+            // FIXME Chrome might block un-trusted events, is there a work around?
+            var clickEvent = new Event('click');
+            link.dispatchEvent(clickEvent);
+        });
     });
 });
 
@@ -177,8 +177,9 @@ var setGlasses = function (glassesImgPath) {
     glassesImg.src = glassesImgPath;
 
     glassesImg.addEventListener('load', function (ev) {
-        var transform = new Transform(new Coords(0, 0), 1);
+        var transform = new Transform(new Coords(0, canvas.height/2), 1);
         var glassesObj = new ImageObject(glassesImg, transform);
+        glassesObj.fresh = true;
         document.getElementById('glassesScale').removeAttribute('disabled');
         document.getElementById('printBtn').removeAttribute('disabled');
         glasses = glassesObj;
@@ -198,6 +199,7 @@ var update = function () {
     if (clicked && glasses) {
         glasses.transform.coords.x = mouseX;
         glasses.transform.coords.y = mouseY;
+        glasses.fresh = false;
     }
 };
 var render = function () {
@@ -210,9 +212,10 @@ var render = function () {
     }
     if (glasses) {
         glasses.draw(ctx);
-        //document.getElementById('helpText').innerText = '';
-        // FIXME don't show this text on downloads
-        ctx.fillText('Click & drag glasses into place, use slider to scale', 96, 96);
+
+        if (glasses.fresh === true) {
+            ctx.fillText('Click & drag glasses into place, use slider to scale', 96, 96);
+        }
     } else {
         ctx.fillText('Now pick the glasses', 96, 96);
     }

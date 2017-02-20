@@ -23,26 +23,30 @@
             <div id="instructions">
                 <div class="step active">
                     <h3>Step 1: Pick Dog</h3>
-                    <label for="dogFile">Dog Image
+                    <label for="dogFile" class="label">Dog Image
                         <input id="dogFile" name="dogFile" type="file" accept="image/*">
                     </label>
-                    - OR - <button id="defaultDogBtn" type="button">Use Default Dog</button>
+                    <div>- OR -</div>
+                    <button id="defaultDogBtn" name="defaultDogBtn" class="control" type="button">Use Default Dog</button>
                 </div>
 
                 <div class="step">
                     <h3>Step 2: Pick Glasses</h3>
-                    <label for="glassesFile">Glasses Image (Coming Soon)
-                        <input id="glassesFile" name="glassesFile" type="file" accept="image/*" disabled="disabled">
+                    <label for="glassesFile" class="label">Glasses Image
+                        <input id="glassesFile" name="glassesFile" class="control" type="file" accept="image/*" disabled="disabled">
                     </label>
-                    - OR - <button id="defaultGlassesBtn" type="button" disabled="disabled">Use Default Glasses</button>
-
-                    <label>Scale Glasses
-                        <input id="glassesScale" name="glassesScale" disabled="disabled" type="range" min="0.1" max="3" step="0.1" value="1">
+                    <div>- OR -</div>
+                    <button id="defaultGlassesBtn" name="defaultGlassesBtn" class="control" type="button" disabled="disabled">
+                        Use Default Glasses
+                    </button>
+                    <div>- AND -</div>
+                    <label for="glassesScale" class="label">Scale Glasses
+                        <input id="glassesScale" name="glassesScale" class="control" disabled="disabled" type="range" min="0.1" max="3" step="0.1" value="1">
                     </label>
                 </div>
 
                 <div class="step">
-                    <button id="printBtn" type="button" disabled="disabled"><h3>Step 3: Save (Experimental)</h3></button>
+                    <button id="printBtn" name="printBtn" class="control" type="button" disabled="disabled"><h3>Step 3: Save</h3></button>
                 </div>
             </div>
         </main>
