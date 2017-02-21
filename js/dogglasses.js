@@ -105,7 +105,7 @@ window.addEventListener('load', function (ev) {
 
     // save image
     document.getElementById('printBtn').addEventListener('click', function (ev) {
-        ctx.fillText('Made using dogglasses.io', 16, 16);
+        ctx.fillText('Made using dogglasses.io', 16, 22);
 
         // Attribute length too long for browser to handle with large dogs, use blob instead.
         //var imgUrl = canvas.toDataURL('image/png');
