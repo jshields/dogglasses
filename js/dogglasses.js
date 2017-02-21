@@ -124,7 +124,7 @@ window.addEventListener('load', function (ev) {
             link.setAttribute('href', imgUrl);
             link.setAttribute('download', 'dogglasses.png');
 
-            // Chrome might block un-trusted events, leave link in document in case
+            // Chrome or Firefox might block un-trusted events, leave link in document in case
             link.innerText = 'Click here if download does not begin automatically';
 
             linkContainer.appendChild(link);
