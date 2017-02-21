@@ -1,12 +1,5 @@
 'use strict';
 
-/*
-var Vector2D = function (coords, scale) {
-    this.coords = coords;
-    this.scale = scale;
-    this.normalize = function () {};
-};
-*/
 var Point = function (x, y) {
     this.x = x;
     this.y = y;
@@ -14,9 +7,9 @@ var Point = function (x, y) {
 };
 var Transform = function (translationPoint, scale) {
     this.coords = translationPoint;
-    //this.rotation = rotationRadians;
+    //TODO this.rotation = rotationRadians;
     this.scale = scale;
-    //this.direction = directionVector;
+    //TODO this.direction = directionVector;
 };
 var ImageObject = function (image, transform) {
     this.image = image;
@@ -43,24 +36,23 @@ var ctx = canvas.getContext('2d', {'alpha': false});
 
 var clicked = false;
 var mouseX, mouseY;
+var imgUrl;
 
 window.addEventListener('load', function (ev) {
 
-    // mouse state variables for canvas... Is there a better way?
+    // mouse state variables for canvas
     canvas.addEventListener('mousedown', function (ev) {
         clicked = true;
     });
     canvas.addEventListener('mouseup', function (ev) {
         clicked = false;
     });
+    // use drag event instead?
     canvas.addEventListener('mousemove', function (ev) {
         /*
         FIXME
         mouse coords will be incorrect relative to canvas
         unless we draw canvas from top left corner of viewport
-
-        FIXME dragging works in Chrome but not FF
-        use drag event instead?
         */
         mouseX = ev.pageX;
         mouseY = ev.pageY;
@@ -71,14 +63,12 @@ window.addEventListener('load', function (ev) {
     document.getElementById('dogFile').addEventListener('change', function (ev) {
         // TODO support image URI input?
         /*
-        FIXME img src attr may be too long for large files when using data URL?
-        Use object URL?
+        FIXME? img src attr may be too long for large files when using data URL
         img.src = URL.createObjectURL(file);
         img.onload = function (ev) {
             URL.revokeObjectURL(this.src);
         };
         */
-        // TODO Test this with very large image
         var file = this.files[0];
         if (file) {
             var reader = new FileReader();
@@ -117,25 +107,27 @@ window.addEventListener('load', function (ev) {
     document.getElementById('printBtn').addEventListener('click', function (ev) {
         ctx.fillText('Made using dogglasses.io', 16, 16);
 
-        // Attribute length too long for browser to handle with large dogs,
-        // use blob instead.
+        // Attribute length too long for browser to handle with large dogs, use blob instead.
         //var imgUrl = canvas.toDataURL('image/png');
 
+        // before new image is generated, expire old one if present
+        var linkContainer = document.getElementById('downloadLinkContainer');
+        linkContainer.innerHTML = '';
+        if (imgUrl) {
+            URL.revokeObjectURL(imgUrl);
+        }
+
         canvas.toBlob(function (blob) {
-            // Will user images cause Tainted Canvas error?
-            var imgUrl = URL.createObjectURL(blob);
+            imgUrl = URL.createObjectURL(blob);
 
             var link = document.createElement('a');
-            link.innerText = 'Click here if download does not begin automatically';
             link.setAttribute('href', imgUrl);
             link.setAttribute('download', 'dogglasses.png');
 
-            // TODO after download is finished
-            //URL.revokeObjectURL(imgUrl);
+            // Chrome might block un-trusted events, leave link in document in case
+            link.innerText = 'Click here if download does not begin automatically';
 
-            document.getElementById('instructions').appendChild(link);
-
-            // FIXME Chrome might block un-trusted events, is there a work around?
+            linkContainer.appendChild(link);
             var clickEvent = new Event('click');
             link.dispatchEvent(clickEvent);
         });
