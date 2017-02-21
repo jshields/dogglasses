@@ -7,13 +7,13 @@ var Vector2D = function (coords, scale) {
     this.normalize = function () {};
 };
 */
-var Coords = function (x, y) {
+var Point = function (x, y) {
     this.x = x;
     this.y = y;
     return this;
 };
-var Transform = function (translationCoords, scale) {
-    this.coords = translationCoords;
+var Transform = function (translationPoint, scale) {
+    this.coords = translationPoint;
     //this.rotation = rotationRadians;
     this.scale = scale;
     //this.direction = directionVector;
@@ -33,7 +33,7 @@ var ImageObject = function (image, transform) {
 };
 
 // FIXME: window.innerWidth includes width of vertical scrollbar (15 in Chrome), we don't want that
-var resolution = new Coords(window.innerWidth - 15, 640);
+var resolution = new Point(window.innerWidth - 15, 640);
 
 var canvas = document.createElement('canvas');
 canvas.innerText = 'Your browser does not support the canvas element.';
@@ -148,13 +148,18 @@ var glasses;
 var setDog = function (dogImgPath) {
 
     var _resizeCanvas = function (canvas, dog) {
-        if (dog.width < canvas.width) {
-            canvas.width = dog.width;
-        } else {
+        var origDogSize = new Point(dog.width, dog.height);
+
+        if (dog.width > canvas.width) {
             // dog larger than canvas
             // TODO smaller max size?
             dog.width = canvas.width;
+        } else {
+            canvas.width = dog.width;
         }
+
+        var scaleRatio = dog.width / origDogSize.x;
+        dog.height *= scaleRatio;
         canvas.height = dog.height;
     };
 
@@ -177,10 +182,14 @@ var setGlasses = function (glassesImgPath) {
     glassesImg.src = glassesImgPath;
 
     glassesImg.addEventListener('load', function (ev) {
-        var transform = new Transform(new Coords(0, canvas.height/2), 1);
+        var transform = new Transform(new Point(0, canvas.height/2), 1);
         var glassesObj = new ImageObject(glassesImg, transform);
         glassesObj.fresh = true;
-        document.getElementById('glassesScale').removeAttribute('disabled');
+
+        var glassesScale = document.getElementById('glassesScale');
+        glassesScale.removeAttribute('disabled');
+        // reset to default value in case this isn't the first pair of glasses since page load
+        glassesScale.value = glassesScale.getAttribute('value');
         document.getElementById('printBtn').removeAttribute('disabled');
         glasses = glassesObj;
     });
