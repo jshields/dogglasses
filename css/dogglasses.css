@@ -3,11 +3,9 @@ html, body {
     padding: 0;
 }
 
-
 .header {
     position: absolute;
-    top: 6;
-    left: 6;
+    padding: 1em;
 }
 .footer {
     position: fixed;
@@ -15,11 +13,11 @@ html, body {
 }
 #instructions {
     border: 1px solid #000;
+    background-color: rgba(100, 100, 100, 0.5);
     position: absolute;
     right: 0;
     top: 0;
-    background-color: rgba(100, 100, 100, 0.5);
-    width: 271px;
+    width: 20%;
 }
 .step {
     border-bottom: 1px solid #000;
@@ -30,4 +28,13 @@ html, body {
 }
 .control {
     display: block;
+}
+
+#desktop-warning {
+    display: none;
+}
+@media screen and (max-width: 640px) {
+    #desktop-warning {
+        display: block;
+    }
 }
