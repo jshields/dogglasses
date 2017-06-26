@@ -1,0 +1,33 @@
+{
+  "responses": [
+    {
+      "labelAnnotations": [
+        {
+          "mid": "/m/0bt9lr",
+          "description": "dog",
+          "score": 0.98329264
+        },
+        {
+          "mid": "/m/01z5f",
+          "description": "dog like mammal",
+          "score": 0.96553093
+        },
+        {
+          "mid": "/m/0kpmf",
+          "description": "dog breed",
+          "score": 0.9425085
+        },
+        {
+          "mid": "/m/04rky",
+          "description": "mammal",
+          "score": 0.9230349
+        },
+        {
+          "mid": "/m/05h0pv",
+          "description": "australian silky terrier",
+          "score": 0.9111539
+        }
+      ]
+    }
+  ]
+}

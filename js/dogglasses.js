@@ -25,6 +25,86 @@ var ImageObject = function (image, transform) {
     };
 };
 
+var computerVisionService = {
+    root: 'https://vision.googleapis.com',
+    methods: {
+        annotate: {
+            uri: '/v1/images:annotate',
+            requestBodyJSON: function (imgContent) {
+                /*
+                single image request, meant to detect 'dog' label in top 5 label hits
+                see: https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Image
+                */
+                return {
+                    "requests": [
+                        {
+                            "image": {
+                                "content": imgContent,  // base64 encoded image
+                            },
+                            "features": [
+                                {"type": "LABEL_DETECTION", "maxResults": 5}
+                            ]
+                        }
+                    ]
+                }
+            },
+            requestParameters: {
+                name: "access_token",
+                value: ''  // API key will be retrieved at runtime, then a nested callback will do the real API call
+            }
+
+        }
+    }
+};
+
+var computeDogScore = function (responseObj) {
+    for (var i =0; i < responseObj.responses.length; i++) {
+        var response = responseObj.responses[i];
+        for (var j = 0; j < response.labelAnnotations.length; j++) {
+            var label = response.labelAnnotations[j];
+            if label.description === 'dog' {
+                return label.score * 100;  // return dog score as percentage
+            }
+        }
+    }
+};
+
+// TODO make generic
+// var ajax = function (method, url, payload, success, error) {};
+
+var dogAjax = function () {
+
+    var successHandler = function () {
+        debugger;
+        console.log(this.responseText);
+        console.log(this.status);
+        /*if (this.status === 200) {
+            console.log();
+        }*/
+    };
+
+    var errorHandler = function () {
+        debugger;
+        console.log(this.responseText);
+    };
+
+    // IDEA consider using `fetch` API
+    /*
+    fetch token
+    then fetch dog information
+    */
+
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", successHandler);
+    xhr.addEventListener("error", errorHandler);
+
+    var endpoint = computerVisionService.root + computerVisionService.methods.annotate.uri;
+    var payload = computerVisionService.methods.annotate.requestBodyJSON();
+
+    xhr.open('POST', endpoint);
+    xhr.send(payload);
+};
+
 // FIXME: window.innerWidth includes width of vertical scrollbar (15 in Chrome), we don't want that
 var resolution = new Point(window.innerWidth - 15, 640);
 
@@ -61,7 +141,6 @@ window.addEventListener('load', function (ev) {
 
     // dog buttons
     document.getElementById('dogFile').addEventListener('change', function (ev) {
-        // TODO support image URI input?
         /*
         FIXME? img src attr may be too long for large files when using data URL
         img.src = URL.createObjectURL(file);
@@ -71,6 +150,17 @@ window.addEventListener('load', function (ev) {
         */
         var file = this.files[0];
         if (file) {
+
+
+            // TODO detect if this is a dog: https://cloud.google.com/vision/
+            (function dogVisionAPI() {
+                // TODO get API token
+                // TODO base64 encoded image data for API
+                //ajaxFormSubmit();
+            });//();
+
+
+            // read the file, create a data URL for it to be used on canvas
             var reader = new FileReader();
             // set callback for when file is read
             reader.addEventListener('loadend', function (ev) {
