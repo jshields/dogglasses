@@ -25,6 +25,7 @@ var ImageObject = function (image, transform) {
     };
 };
 
+// https://vision.googleapis.com/$discovery/rest?version=v1
 var computerVisionService = {
     root: 'https://vision.googleapis.com',
     methods: {
@@ -42,15 +43,19 @@ var computerVisionService = {
                                 "content": imgContent,  // base64 encoded image
                             },
                             "features": [
-                                {"type": "LABEL_DETECTION", "maxResults": 5}
+                                {"type": "LABEL_DETECTION", "maxResults": 50}
+                                /*
+                                NOTE: Web Entities search seems to more readily return specific dog breed than label detection does
+                                Web Entities -> Yorkshire Terrier  72.87211
+                                */
                             ]
                         }
                     ]
                 }
             },
             requestParameters: {
-                name: "access_token",
-                value: ''  // API key will be retrieved at runtime, then a nested callback will do the real API call
+                name: "", // TODO some type of API key or OAuth token. To investigate.
+                value: ""  // API key will be retrieved at runtime, then a nested callback will do the real API call
             }
 
         }
@@ -67,6 +72,7 @@ var computeDogScore = function (responseObj) {
             }
         }
     }
+    return 0.0;
 };
 
 // TODO make generic
@@ -84,25 +90,32 @@ var dogAjax = function () {
     };
 
     var errorHandler = function () {
-        debugger;
-        console.log(this.responseText);
+        console.error(this.responseText);
     };
 
-    // IDEA consider using `fetch` API
-    /*
-    fetch token
-    then fetch dog information
-    */
-
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", successHandler);
-    xhr.addEventListener("error", errorHandler);
+    // IDEA consider using `fetch` API to cleanup callbacks
+    var dogXhr = new XMLHttpRequest();
+    dogXhr.addEventListener("load", successHandler);
+    dogXhr.addEventListener("error", errorHandler);
 
     var endpoint = computerVisionService.root + computerVisionService.methods.annotate.uri;
     var payload = computerVisionService.methods.annotate.requestBodyJSON();
 
-    xhr.open('POST', endpoint);
-    xhr.send(payload);
+    var keyXhr = new XMLHttpRequest();
+    keyXhr.addEventListener("load", function () {
+        debugger;
+        var data = JSON.parse(this.responseText);
+        var queryParams = '?key=' + value;
+        dogXhr.open('POST', endpoint + queryParams);
+        dogXhr.send(payload);
+    });
+    keyXhr.addEventListener("error", function () {
+        console.error('error');
+    });
+    keyXhr.open('GET', 'definitely_not_my_api_key.json');
+    keyXhr.send();
+
+
 };
 
 // FIXME: window.innerWidth includes width of vertical scrollbar (15 in Chrome), we don't want that
