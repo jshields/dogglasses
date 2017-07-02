@@ -25,97 +25,127 @@ var ImageObject = function (image, transform) {
     };
 };
 
-// https://vision.googleapis.com/$discovery/rest?version=v1
-var computerVisionService = {
-    root: 'https://vision.googleapis.com',
-    methods: {
-        annotate: {
-            uri: '/v1/images:annotate',
-            requestBodyJSON: function (imgContent) {
-                /*
-                single image request, meant to detect 'dog' label in top 5 label hits
-                see: https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Image
-                */
-                return {
-                    "requests": [
-                        {
-                            "image": {
-                                "content": imgContent,  // base64 encoded image
-                            },
-                            "features": [
-                                {"type": "LABEL_DETECTION", "maxResults": 50}
-                                /*
-                                NOTE: Web Entities search seems to more readily return specific dog breed than label detection does
-                                Web Entities -> Yorkshire Terrier  72.87211
-                                */
-                            ]
-                        }
-                    ]
+var dogAjax = function (imgContent) {
+
+    // https://vision.googleapis.com/$discovery/rest?version=v1
+    var computerVisionService = {
+        root: 'https://vision.googleapis.com',
+        methods: {
+            annotate: {
+                uri: '/v1/images:annotate',
+                requestBodyJSON: function (imgContent) {
+                    /*
+                    single image request, meant to detect 'dog' label in top 5 label hits
+                    see: https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Image
+                    */
+                    return {
+                        "requests": [
+                            {
+                                "image": {
+                                    "content": imgContent,  // base64 encoded image
+                                },
+                                "features": [
+                                    {"type": "LABEL_DETECTION", "maxResults": 50}
+                                    /*
+                                    NOTE: Web Entities search seems to more readily return specific dog breed than label detection does
+                                    Web Entities -> Yorkshire Terrier  72.87211
+                                    */
+                                ]
+                            }
+                        ]
+                    }
                 }
-            },
-            requestParameters: {
-                name: "", // TODO some type of API key or OAuth token. To investigate.
-                value: ""  // API key will be retrieved at runtime, then a nested callback will do the real API call
-            }
-
-        }
-    }
-};
-
-var computeDogScore = function (responseObj) {
-    for (var i =0; i < responseObj.responses.length; i++) {
-        var response = responseObj.responses[i];
-        for (var j = 0; j < response.labelAnnotations.length; j++) {
-            var label = response.labelAnnotations[j];
-            if label.description === 'dog' {
-                return label.score * 100;  // return dog score as percentage
             }
         }
-    }
-    return 0.0;
-};
-
-// TODO make generic
-// var ajax = function (method, url, payload, success, error) {};
-
-var dogAjax = function () {
-
-    var successHandler = function () {
-        debugger;
-        console.log(this.responseText);
-        console.log(this.status);
-        /*if (this.status === 200) {
-            console.log();
-        }*/
     };
 
-    var errorHandler = function () {
+    var getDogScore = function (responseObj) {
+        for (var i =0; i < responseObj.responses.length; i++) {
+            var response = responseObj.responses[i];
+            for (var j = 0; j < response.labelAnnotations.length; j++) {
+                var label = response.labelAnnotations[j];
+                if (label.description === 'dog') {
+                    return label.score * 100;  // return dog score as percentage
+                }
+            }
+        }
+        return 0.0;
+    };
+
+    /*var statusColorFromPercent = function (percent) {
+        // 0% -> red, 100% -> green, e.g. like a health bar
+        var redComp = 100 - percent,
+            greenComp = percent,
+            blueComp = 50;
+        // return some valid CSS color value
+        return (
+            'rgb(' +
+            redComp + '%,' +
+            greenComp + '%, ' +
+            blueComp + '%)'
+        );
+    }*/
+
+    var quantizeScoreToClass = function(score) {
+        var colorClassForScore = new Map([
+            ['alert', 30],
+            ['warn', 70],
+            ['success', 100]
+        ]);
+        for (var [key, value] of colorClassForScore.entries()) {
+            if (score <= value) {
+                return key;
+            }
+        }
+        console.error('score out of range');
+    };
+
+    var visionSuccessHandler = function () {
+        console.log(this.responseText);
+        console.log(this.status);
+        var dogScoreEl = document.getElementById('dogScore');
+        debugger;
+
+        if (this.status === 200) {
+            var dogScore = getDogScore(JSON.parse(this.responseText));
+            //var color = statusColorFromPercent(dogScore);
+            var statusClass = quantizeScoreToClass(dogScore);
+            // dogScoreEl.setAttribute('data-color', color);
+            dogScoreEl.innerText = 'Dog Score:' + dogScore;
+            dogScoreEl.className = statusClass;
+        } else {
+            dogScoreEl.innerText = 'Error getting Dog Score';
+            dogScoreEl.className = quantizeScoreToClass(0);
+            console.error('server responded with error');
+        }
+    };
+
+    var visionErrorHandler = function () {
         console.error(this.responseText);
     };
 
     // IDEA consider using `fetch` API to cleanup callbacks
     var dogXhr = new XMLHttpRequest();
-    dogXhr.addEventListener("load", successHandler);
-    dogXhr.addEventListener("error", errorHandler);
+    dogXhr.addEventListener('load', successHandler);
+    dogXhr.addEventListener('error', errorHandler);
 
     var endpoint = computerVisionService.root + computerVisionService.methods.annotate.uri;
-    var payload = computerVisionService.methods.annotate.requestBodyJSON();
+    var payload = computerVisionService.methods.annotate.requestBodyJSON(imgContent);
 
     var keyXhr = new XMLHttpRequest();
-    keyXhr.addEventListener("load", function () {
+    keyXhr.addEventListener('load', function () {
         debugger;
         var data = JSON.parse(this.responseText);
+
         var queryParams = '?key=' + value;
         dogXhr.open('POST', endpoint + queryParams);
         dogXhr.send(payload);
     });
-    keyXhr.addEventListener("error", function () {
+    keyXhr.addEventListener('error', function () {
         console.error('error');
     });
-    keyXhr.open('GET', 'definitely_not_my_api_key.json');
+    keyXhr.open('GET', 'https://dl.dropboxusercontent.com/s/krijqh2zqlb30g7/test.json?dl=0');
     keyXhr.send();
-
-
 };
 
 // FIXME: window.innerWidth includes width of vertical scrollbar (15 in Chrome), we don't want that
@@ -164,14 +194,9 @@ window.addEventListener('load', function (ev) {
         var file = this.files[0];
         if (file) {
 
-
             // TODO detect if this is a dog: https://cloud.google.com/vision/
-            (function dogVisionAPI() {
-                // TODO get API token
-                // TODO base64 encoded image data for API
-                //ajaxFormSubmit();
-            });//();
-
+            // var imgContent = ;  // API wants base64 image data
+            dogAjax(imgContent);
 
             // read the file, create a data URL for it to be used on canvas
             var reader = new FileReader();
@@ -211,7 +236,7 @@ window.addEventListener('load', function (ev) {
         ctx.fillText('Made using dogglasses.io', 16, 22);
 
         // Attribute length too long for browser to handle with large dogs, use blob instead.
-        //var imgUrl = canvas.toDataURL('image/png');
+        // imgUrl = canvas.toDataURL('image/png');
 
         // before new image is generated, expire old one if present
         var linkContainer = document.getElementById('downloadLinkContainer');
