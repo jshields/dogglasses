@@ -26,9 +26,8 @@
                 <div class="step active">
                     <h3>Step 1: Pick Dog</h3>
                     <label for="dogFile" class="label">Dog Image
-                        <input id="dogFile" name="dogFile" type="file" accept="image/*">
+                        <input id="dogFile" class="control" name="dogFile" type="file" accept="image/*">
                     </label>
-                    <div>- OR -</div>
                     <button id="defaultDogBtn" name="defaultDogBtn" class="control" type="button">Use Default Dog</button>
                     <!--TODO selection of defaults
                     <select>
@@ -44,13 +43,13 @@
                 <div class="step">
                     <h3>Step 2: Pick Glasses</h3>
                     <label for="glassesFile" class="label">Glasses Image
-                        <input id="glassesFile" name="glassesFile" class="control" type="file" accept="image/*" disabled="disabled">
+                        <input id="glassesFile" class="control" name="glassesFile" type="file" accept="image/*" disabled="disabled">
                     </label>
-                    <div>- OR -</div>
+
                     <button id="defaultGlassesBtn" name="defaultGlassesBtn" class="control" type="button" disabled="disabled">
                         Use Default Glasses
                     </button>
-                    <div>- AND -</div>
+
                     <label for="glassesScale" class="label">Scale Glasses
                         <input id="glassesScale" name="glassesScale" class="control" disabled="disabled" type="range" min="0.1" max="3" step="0.1" value="1">
                     </label>

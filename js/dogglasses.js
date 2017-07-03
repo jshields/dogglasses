@@ -30,6 +30,7 @@ var dogAjax = function (imgContent) {
     // https://vision.googleapis.com/$discovery/rest?version=v1
     var computerVisionService = {
         root: 'https://vision.googleapis.com',
+        test_url: 'fixtures/dog_response.json',  // FIXME test code in the real code
         methods: {
             annotate: {
                 uri: '/v1/images:annotate',
@@ -126,18 +127,18 @@ var dogAjax = function (imgContent) {
 
     // IDEA consider using `fetch` API to cleanup callbacks
     var dogXhr = new XMLHttpRequest();
-    dogXhr.addEventListener('load', successHandler);
-    dogXhr.addEventListener('error', errorHandler);
+    dogXhr.addEventListener('load', visionSuccessHandler);
+    dogXhr.addEventListener('error', visionErrorHandler);
 
-    var endpoint = computerVisionService.root + computerVisionService.methods.annotate.uri;
+    //var endpoint = computerVisionService.root + computerVisionService.methods.annotate.uri;
+    var endpoint = computerVisionService.test_url;
     var payload = computerVisionService.methods.annotate.requestBodyJSON(imgContent);
 
     var keyXhr = new XMLHttpRequest();
     keyXhr.addEventListener('load', function () {
         debugger;
         var data = JSON.parse(this.responseText);
-
-        var queryParams = '?key=' + value;
+        var queryParams = '?key=';// + data.key;
         dogXhr.open('POST', endpoint + queryParams);
         dogXhr.send(payload);
     });
@@ -148,8 +149,7 @@ var dogAjax = function (imgContent) {
     keyXhr.send();
 };
 
-// FIXME: window.innerWidth includes width of vertical scrollbar (15 in Chrome), we don't want that
-var resolution = new Point(window.innerWidth - 15, 640);
+var resolution = new Point(640, 640);
 
 var canvas = document.createElement('canvas');
 canvas.innerText = 'Your browser does not support the canvas element.';
@@ -193,23 +193,21 @@ window.addEventListener('load', function (ev) {
         */
         var file = this.files[0];
         if (file) {
-
-            // TODO detect if this is a dog: https://cloud.google.com/vision/
-            // var imgContent = ;  // API wants base64 image data
-            dogAjax(imgContent);
-
             // read the file, create a data URL for it to be used on canvas
             var reader = new FileReader();
             // set callback for when file is read
             reader.addEventListener('loadend', function (ev) {
-                setDog(ev.target.result);
+                var base64Url = ev.target.result;
+                setDog(base64Url);
+                // need to strip out URL part to get just base 64 string
+                dogAjax(base64Url.replace('data:image/jpeg;base64,', ''));
             });
             // start reading file
             reader.readAsDataURL(file);
         }
     });
     document.getElementById('defaultDogBtn').addEventListener('click', function (ev) {
-        setDog('img/little_tootie.jpg');
+        setDog('img/dog/little_tootie.jpg');
     });
 
     // glasses buttons
@@ -224,7 +222,7 @@ window.addEventListener('load', function (ev) {
         }
     });
     document.getElementById('defaultGlassesBtn').addEventListener('click', function (ev) {
-        setGlasses('img/dealwithit_glasses.png');
+        setGlasses('img/glasses/dealwithit_glasses.png');
     });
 
     document.getElementById('glassesScale').addEventListener('input', function (ev) {
@@ -269,6 +267,7 @@ var setDog = function (dogImgPath) {
 
     var _resizeCanvas = function (canvas, dog) {
         var origDogSize = new Point(dog.width, dog.height);
+        canvas.width = document.body.clientWidth;
 
         if (dog.width > canvas.width) {
             // dog larger than canvas

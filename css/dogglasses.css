@@ -14,7 +14,7 @@ html, body {
 }
 #instructions {
     border: 1px solid #000;
-    background-color: rgba(100, 100, 100, 0.5);
+    background-color: rgba(80, 80, 80, 0.5);
     position: absolute;
     right: 0;
     top: 0;
@@ -22,7 +22,6 @@ html, body {
 }
 #dogScore {
     /*not supported yet: background-color: attr(data-color color);*/
-    border: 1px solid #000;
     margin-top: 0.5em;
     padding: 0 1em;
     display: inline-block;
@@ -39,13 +38,16 @@ html, body {
 
 .step {
     border-bottom: 1px solid #000;
+    padding: 0 1em;
 }
 .label {
     font-weight: bold;
     display: block;
+
 }
 .control {
     display: block;
+    margin: 1em;
 }
 
 #desktop-warning {
