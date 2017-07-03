@@ -70,6 +70,7 @@ var dogAjax = function (imgContent) {
                 }
             }
         }
+        console.warn('Could not find dog label');
         return 0.0;
     };
 
@@ -105,14 +106,13 @@ var dogAjax = function (imgContent) {
         console.log(this.responseText);
         console.log(this.status);
         var dogScoreEl = document.getElementById('dogScore');
-        debugger;
 
         if (this.status === 200) {
             var dogScore = getDogScore(JSON.parse(this.responseText));
             //var color = statusColorFromPercent(dogScore);
             var statusClass = quantizeScoreToClass(dogScore);
             // dogScoreEl.setAttribute('data-color', color);
-            dogScoreEl.innerText = 'Dog Score:' + dogScore;
+            dogScoreEl.innerText = 'Dog Score: ' + dogScore.toFixed(2);
             dogScoreEl.className = statusClass;
         } else {
             dogScoreEl.innerText = 'Error getting Dog Score';
@@ -136,7 +136,6 @@ var dogAjax = function (imgContent) {
 
     var keyXhr = new XMLHttpRequest();
     keyXhr.addEventListener('load', function () {
-        debugger;
         var data = JSON.parse(this.responseText);
         var queryParams = '?key=';// + data.key;
         dogXhr.open('POST', endpoint + queryParams);
@@ -269,9 +268,11 @@ var setDog = function (dogImgPath) {
         var origDogSize = new Point(dog.width, dog.height);
         canvas.width = document.body.clientWidth;
 
+        // TODO smaller max size is needed for usability
+        // max height: window.innerHeight ?
+
         if (dog.width > canvas.width) {
             // dog larger than canvas
-            // TODO smaller max size?
             dog.width = canvas.width;
         } else {
             canvas.width = dog.width;

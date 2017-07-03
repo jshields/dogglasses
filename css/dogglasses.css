@@ -22,18 +22,26 @@ html, body {
 }
 #dogScore {
     /*not supported yet: background-color: attr(data-color color);*/
-    margin-top: 0.5em;
+    margin-bottom: 0.5em;
     padding: 0 1em;
     display: inline-block;
+    min-height: calc(1em + 4px);
+    font-size: 1em;
+    border-width: 2px;
+    border-style: solid;
 }
+
 .alert {
     background-color: #f22;
+    border-color: #922;
 }
 .warn {
     background-color: #f60;
+    border-color: #a30;
 }
 .success {
     background-color: #2f2;
+    border-color: #494;
 }
 
 .step {
