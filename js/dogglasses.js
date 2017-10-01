@@ -7,9 +7,8 @@ var Point = function (x, y) {
 };
 var Transform = function (translationPoint, scale) {
     this.coords = translationPoint;
-    //TODO this.rotation = rotationRadians;
+    //TODO glasses rotation, this.rotation = rotationRadians;
     this.scale = scale;
-    //TODO this.direction = directionVector;
 };
 var ImageObject = function (image, transform) {
     this.image = image;
@@ -30,7 +29,7 @@ var dogAjax = function (imgContent) {
     // https://vision.googleapis.com/$discovery/rest?version=v1
     var computerVisionService = {
         root: 'https://vision.googleapis.com',
-        test_url: 'fixtures/dog_response.json',  // FIXME test code in the real code
+        test_url: 'fixtures/dog_response.json',  // FIXME remove test url
         methods: {
             annotate: {
                 uri: '/v1/images:annotate',
@@ -66,27 +65,14 @@ var dogAjax = function (imgContent) {
             for (var j = 0; j < response.labelAnnotations.length; j++) {
                 var label = response.labelAnnotations[j];
                 if (label.description === 'dog') {
-                    return label.score * 100;  // return dog score as percentage
+                    // return dog score as percentage w/ 2 decimal places
+                    return (label.score * 100).toFixed(2);
                 }
             }
         }
         console.warn('Could not find dog label');
-        return 0.0;
+        return 0.00;
     };
-
-    /*var statusColorFromPercent = function (percent) {
-        // 0% -> red, 100% -> green, e.g. like a health bar
-        var redComp = 100 - percent,
-            greenComp = percent,
-            blueComp = 50;
-        // return some valid CSS color value
-        return (
-            'rgb(' +
-            redComp + '%,' +
-            greenComp + '%, ' +
-            blueComp + '%)'
-        );
-    }*/
 
     var quantizeScoreToClass = function(score) {
         var colorClassForScore = new Map([
@@ -105,24 +91,24 @@ var dogAjax = function (imgContent) {
     var visionSuccessHandler = function () {
         console.log(this.responseText);
         console.log(this.status);
-        var dogScoreEl = document.getElementById('dogScore');
 
         if (this.status === 200) {
-            var dogScore = getDogScore(JSON.parse(this.responseText));
-            //var color = statusColorFromPercent(dogScore);
+            dogScore = getDogScore(JSON.parse(this.responseText));
             var statusClass = quantizeScoreToClass(dogScore);
-            // dogScoreEl.setAttribute('data-color', color);
-            dogScoreEl.innerText = 'Dog Score: ' + dogScore.toFixed(2);
+            var dogScoreEl = document.getElementById('dogScore');
+            dogScoreEl.innerText = 'Dog Score: ' + dogScore;
             dogScoreEl.className = statusClass;
+            document.getElementById('includeDogScore').removeAttribute('disabled');
         } else {
-            dogScoreEl.innerText = 'Error getting Dog Score';
-            dogScoreEl.className = quantizeScoreToClass(0);
-            console.error('server responded with error');
+            visionErrorHandler();
         }
     };
 
     var visionErrorHandler = function () {
-        console.error(this.responseText);
+        var dogScoreEl = document.getElementById('dogScore');
+        dogScoreEl.innerText = 'Error getting Dog Score';
+        dogScoreEl.className = quantizeScoreToClass(0);
+        console.error('server did not respond with OK');
     };
 
     // IDEA consider using `fetch` API to cleanup callbacks
@@ -130,22 +116,26 @@ var dogAjax = function (imgContent) {
     dogXhr.addEventListener('load', visionSuccessHandler);
     dogXhr.addEventListener('error', visionErrorHandler);
 
-    //var endpoint = computerVisionService.root + computerVisionService.methods.annotate.uri;
-    var endpoint = computerVisionService.test_url;
+    var endpoint = computerVisionService.root + computerVisionService.methods.annotate.uri;
+    //var endpoint = computerVisionService.test_url;
+
     var payload = computerVisionService.methods.annotate.requestBodyJSON(imgContent);
 
-    var keyXhr = new XMLHttpRequest();
-    keyXhr.addEventListener('load', function () {
+    var inconspicuousXhr = new XMLHttpRequest();
+    inconspicuousXhr.addEventListener('load', function () {
         var data = JSON.parse(this.responseText);
-        var queryParams = '?key=';// + data.key;
+        var queryParams = '?key=' + data.key;  // at least not in the VCS
         dogXhr.open('POST', endpoint + queryParams);
-        dogXhr.send(payload);
+        dogXhr.send(JSON.stringify(payload));
     });
-    keyXhr.addEventListener('error', function () {
-        console.error('error');
+    inconspicuousXhr.addEventListener('error', function () {
+        console.error('error retrieving inconspicuous data');
     });
-    keyXhr.open('GET', 'https://dl.dropboxusercontent.com/s/krijqh2zqlb30g7/test.json?dl=0');
-    keyXhr.send();
+    inconspicuousXhr.open(
+        'GET',
+        atob('aHR0cHM6Ly9kbC5kcm9wYm94dXNlcmNvbnRlbnQuY29tL3MvYTJidm5zb3R4dDF0MmMwL2RvZ19hcGlfa2V5Lmpzb24/ZGw9MA==')
+    );
+    inconspicuousXhr.send();
 };
 
 var resolution = new Point(640, 640);
@@ -184,7 +174,7 @@ window.addEventListener('load', function (ev) {
     // dog buttons
     document.getElementById('dogFile').addEventListener('change', function (ev) {
         /*
-        FIXME? img src attr may be too long for large files when using data URL
+        BUG? img src attr may be too long for large files when using data URL (?)
         img.src = URL.createObjectURL(file);
         img.onload = function (ev) {
             URL.revokeObjectURL(this.src);
@@ -198,7 +188,7 @@ window.addEventListener('load', function (ev) {
             reader.addEventListener('loadend', function (ev) {
                 var base64Url = ev.target.result;
                 setDog(base64Url);
-                // need to strip out URL part to get just base 64 string
+                // HACK: need to strip out URL part to get just the base 64 string
                 dogAjax(base64Url.replace('data:image/jpeg;base64,', ''));
             });
             // start reading file
@@ -206,6 +196,7 @@ window.addEventListener('load', function (ev) {
         }
     });
     document.getElementById('defaultDogBtn').addEventListener('click', function (ev) {
+        // currently we don't retrieve any score for default dog
         setDog('img/dog/little_tootie.jpg');
     });
 
@@ -259,7 +250,7 @@ window.addEventListener('load', function (ev) {
     });
 });
 
-var dog;
+var dog, dogScore;
 var glasses;
 
 var setDog = function (dogImgPath) {
@@ -347,6 +338,9 @@ var render = function () {
         }
     } else {
         ctx.fillText('Now pick the glasses', 96, 96);
+    }
+    if (dogScore && document.getElementById('includeDogScore').checked) {
+        ctx.fillText('Dog Score: ' + dogScore, 32, canvas.height - 32);
     }
 };
 var main = function () {
