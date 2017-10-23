@@ -339,7 +339,7 @@ var render = function () {
     } else {
         ctx.fillText('Now pick the glasses', 96, 96);
     }
-    if (dogScore && document.getElementById('includeDogScore').checked) {
+    if (dogScore >= 0 && document.getElementById('includeDogScore').checked) {
         // IDEA: color red, orange, or green based on score
         ctx.fillText('Dog Score: ' + dogScore, 32, canvas.height - 32);
     }
