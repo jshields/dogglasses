@@ -24,10 +24,10 @@ html, body {
 }
 #dogScore {
     /*not supported yet: background-color: attr(data-color color);*/
-    padding: 0 1em;
+    padding: 0 0.5em;
     display: inline-block;
     min-height: calc(1em + 4px);
-    font-size: 1em;
+    font-size: 0.8em;
     border-width: 2px;
     border-style: solid;
 }
