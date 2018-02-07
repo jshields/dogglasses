@@ -1,4 +1,4 @@
-# dogglasses.io
+# dogglasses
 
 Put glasses on a dog.
 
