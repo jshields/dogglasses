@@ -64,7 +64,7 @@ var dogAjax = function (imgContent) {
             var response = responseObj.responses[i];
             for (var j = 0; j < response.labelAnnotations.length; j++) {
                 var label = response.labelAnnotations[j];
-                if (label.description === 'dog') {
+                if (label.description.toLowerCase() === 'dog') {
                     // return dog score as percentage w/ 2 decimal places
                     return (label.score * 100).toFixed(2);
                 }
