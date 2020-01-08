@@ -2,7 +2,7 @@
 
 Put glasses on a dog.
 Sometimes this breaks when the Google image API changes.
-TODO: specify a specific API version if possible
+TODO: specify an API version if possible
 
 Dog score only supports .jpg, I think because the ML model was trained on jpeg data.
 
